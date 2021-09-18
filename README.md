@@ -23,8 +23,8 @@ where H<sub>i</sub><sup>X</sup> and H<sub>i</sub><sup>A</sup> are the X chromoso
 
 yields three output files:
 1. output.xlsx: Sex ratios for generations 2-15 and the equilibrium value. This is a corrected version of Table S9B in Micheletti et al. (2020)<sup>1</sup>. This table corresponds to Table S3 in our publication.</p>
-2. output_equally.xlsx: Sex ratios for generations 2-15 after admixture and the equilibrium after distributing unassigned ancestries equally to all ancestral populations. This table corresponds to Table S4 in our publication. 
-3. figure1.jpeg: **A)** Illustration of the sensitivity of the applied models towards small changes in the observed ancestry proportions. **B)** Exploration of the parameter space leading to male-biased admixture, female-biased admixture, or model breakage. ![](figure1.jpeg)
+2. output_equally.xlsx: Sex ratios for generations 2-15 after admixture and the equilibrium after distributing unassigned ancestries equally to all ancestral populations. This table corresponds to Table S4 in our publication.
+3. figure1.pdf: **A)** Illustration of the sensitivity of the applied models towards small changes in the observed ancestry proportions. **B)** Exploration of the parameter space leading to male-biased admixture, female-biased admixture, or model breakage. ![](figure1.pdf)
 
 By default, we distribute the unassigned ancestry equally to all ancestral bins, but we also support distributing them proportionally by setting the <code>-p</code> flag. In this case, output file two is named output_proportionally.xlsx (Table S5 in our publication).
 
