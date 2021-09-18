@@ -210,8 +210,8 @@ def main(argv):
                                               'given. The last column should be named "pf" and represent proportion of '
                                               'females contributing to the gene pool. Comments can be included in '
                                               'separate lines, starting with a "#", and are ignored while parsing. '
-                                              'The file should be comma separated.')
-    parser.add_argument('-o', '--output', help='Output filename. Will be an excel file.')
+                                              'The file should be comma separated.', required=True)
+    parser.add_argument('-o', '--output', help='Output filename. Will be an excel file.', required=True)
     parser.add_argument('-p', '--proportionally', help='Set flag to distribute missing ancestries proportionally.'
                                                        'Default is equally', action='store_true', default=False,
                         required=False)
