@@ -80,6 +80,8 @@ scripts/estimate_sex_ratios_constant_admixture.py -i input.txt -n 0.02 -d 0.01 -
 ```
 where 0.02 increments are used for the gridsearch (`-n`), accept only constant admixture parameter that have an Eucleadean distance less than 0.01 to observed mean ancestry proportions (`-d`), admixture is assumed to have occured 15 generations ago (`-g`), the output figure is saved to output_figure.pdf (`-o`), and initial female and male contributions are assumed to have been 0.5 (`--sf0` and `--sm0`; the effect of initial contributions is erased if g > 10).
 
+Figure S1 in our manuscript can be reproduced by replacing `input.txt` with `data/ancestry_proportions_micheletti.txt` in the above command.
+
 ### Recalculation of sex ratios based on summary statistics from Micheletti et al., calculation of possible sex ratios given the unassigend ancestry in their study, and sensitivity analysis of the applied models
 
 #### Software requirements
