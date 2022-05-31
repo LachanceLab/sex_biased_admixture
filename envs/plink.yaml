@@ -1,0 +1,17 @@
+name: plink
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - _libgcc_mutex=0.1=conda_forge
+  - _openmp_mutex=4.5=1_gnu
+  - libgcc-ng=11.2.0=h1d223b6_12
+  - libgfortran-ng=11.2.0=h69a702a_12
+  - libgfortran5=11.2.0=h5c6108e_12
+  - libgomp=11.2.0=h1d223b6_12
+  - libopenblas=0.3.18=pthreads_h8fe5266_0
+  - libstdcxx-ng=11.2.0=he4da1e4_12
+  - openblas=0.3.18=pthreads_h4748800_0
+  - plink2=2.00a2.3=hb2a7ceb_2
+prefix: /home/admin-aaron/anaconda3/envs/plink

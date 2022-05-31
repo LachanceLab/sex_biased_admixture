@@ -1,0 +1,229 @@
+// Model based on Gravel et al. 2011  (doi:10.1073/pnas.1019276108) and Browning et al. 2018 (https://doi.org/10.1371/journal.pgen.1007385)
+// Exact values of Gravel paper from SLiM manual
+initialize() {
+	defineConstant("L", 1000);
+	defineConstant("rec", 1e-8);
+//	defineConstant("sex", 'X');
+//	defineConstant("afr", 1/6);
+//	defineConstant("sm_afr", 1/2);
+//	defineConstant("eur", 1/3);
+//	defineConstant("sm_eur", 1/2);
+//	defineConstant("ea", 1/2);
+//	defineConstant("sm_ea", 1/2);
+//	defineConstant('adx_n', 1000);
+//	defineConstant('outfile', '/home/admin-aaron/sex_ratios/example_sim.trees');
+	initializeSLiMModelType("nonWF");
+//	initializeSLiMOptions(keepPedigrees = T);
+//    initializeSLiMOptions(nucleotideBased=T);
+//    initializeAncestralNucleotides(randomNucleotides(asInteger(L)));
+	initializeTreeSeq();
+	initializeMutationRate(0.0);
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	initializeMutationType('m2', 1, "f", 0.0); //Y marker
+	initializeMutationType('m3', 1, "f", 0.0); //mtDNA maker
+	m1.convertToSubstitution = T;
+	initializeGenomicElementType("g1", m1, 1.0);//Pseudo autosomal
+	initializeGenomicElementType("g2", m1, 1.0);//non par
+	initializeGenomicElement(g1, 0, asInteger(L - 1)); // PAR
+	initializeGenomicElement(g2, L, 2 * L + L_mtDNA - 1);// nonPAR
+	// A, break, sex, break, mtDNA
+	initializeSex('A');
+	chromosomes=c(L - 1, L, 2 * L -1, 2 * L, 2 * L + L_mtDNA - 1);
+	// rec autosomes, break, rec X, break, Y chrom, break, mtDNA
+	rates_females=c(rec, 0.5, rec, 0.0, 0.0);
+	rates_males=c(rec, 0.5, 0.0, 0.0, 0.0);
+	initializeRecombinationRate(rates_females, chromosomes,sex='F');
+	initializeRecombinationRate(rates_males, chromosomes,sex='M');
+
+}
+
+// Ensure only maternal inheritance of X chromosome
+recombination() {
+	if (individual.sex == 'F' & genome1.containsMarkerMutation(m3, 2 * L + L_mtDNA - 1) & length(breakpoints) % 2 != 0) {
+		breakpoints = c(breakpoints, c(2 * L));
+		return T;
+	}
+	else if (individual.sex == 'F' & genome2.containsMarkerMutation(m3, 2 * L + L_mtDNA - 1) & length(breakpoints) % 2 == 0) {
+		breakpoints = c(breakpoints, c(2 * L));
+		return T;
+	}
+	if (individual.sex == 'M' & !genome2.containsMarkerMutation(m3, 2 * L + L_mtDNA -1) & length(breakpoints) % 2 == 0) {
+		breakpoints = c(breakpoints, c(2 * L));
+		return T;
+	}
+	else if (individual.sex == 'M' & !genome1.containsMarkerMutation(m3, 2 * L + L_mtDNA -1) & length(breakpoints) % 2 != 0) {
+		breakpoints = c(breakpoints, c(2 * L));
+		return T;
+	}
+	return F;
+}
+
+// discrete WF generations
+reproduction(p1) {
+	K = subpop.getValue('K');
+	new_gen  = 0;
+	// enforce generation of K offspring
+	while (new_gen < K) {
+		// parents are chosen randomly, irrespective of fitness
+		parents1 = subpop.sampleIndividuals(1, replace=T, sex='F');
+		parents2 = subpop.sampleIndividuals(1, replace=T, sex='M');
+		offspring = subpop.addCrossed(parents1, parents2);
+		if (!isNULL(offspring))
+			new_gen = new_gen + 1;
+	}
+	self.active = 0;
+}
+
+reproduction(p2) {
+	K = subpop.getValue('K');
+	new_gen  = 0;
+	// enforce generation of K offspring
+	while (new_gen < K) {
+		// parents are chosen randomly, irrespective of fitness
+		parents1 = subpop.sampleIndividuals(1, replace=T, sex='F');
+		parents2 = subpop.sampleIndividuals(1, replace=T, sex='M');
+		offspring = subpop.addCrossed(parents1, parents2);
+		if (!isNULL(offspring))
+			new_gen = new_gen + 1;
+	}
+	self.active = 0;
+}
+
+reproduction(p3) {
+	K = subpop.getValue('K');
+	new_gen  = 0;
+	// enforce generation of K offspring
+	while (new_gen < K) {
+		// parents are chosen randomly, irrespective of fitness
+		parents1 = subpop.sampleIndividuals(1, replace=T, sex='F');
+		parents2 = subpop.sampleIndividuals(1, replace=T, sex='M');
+		offspring = subpop.addCrossed(parents1, parents2);
+		if (!isNULL(offspring))
+			new_gen = new_gen + 1;
+	}
+	self.active = 0;
+}
+
+// Ensure that males have one Y chromosome and females none
+modifyChild() {
+	numY = sum(child.genomes.containsMarkerMutation(m2, 2 * L - 1));
+	// no individual should have more than one Y
+	if (numY > 1)
+		stop("### ERROR: got too many Ys");
+	// females should have 0 Y's
+	if (child.sex == "F" & numY > 0)
+		return F;
+	// males should have 1 Y
+	if (child.sex == "M" & numY == 0)
+		return F;
+	return T;
+}
+
+
+// Initialize ancestral African population
+1 early() {
+    K = asInteger(round(7310.370867595234));
+    sim.addSubpop('p1', K).setValue('K', K);
+    i = p1.individuals;
+    // add marker alleles
+	i[i.sex == "M"].genome2.addNewMutation(m2, 0.0, 2 * L - 1);
+	i[i.sex == "F"].genome2.addNewMutation(m3, 0.0, 2 * L + L_mtDNA - 1);
+    log = sim.createLogFile(logfile, logInterval=1000);
+    log.addGeneration();
+    log.addCustomColumn('N_1', "p1.individualCount;");
+    if (sim.generation > 76968) {
+        log.addCustomColumn('N_2', "p2.individualCount;");
+
+    }
+    if (sim.generation > 78084) {
+        log.addCustomColumn('N_3', "p3.individualCount;");
+    }
+}
+
+early () {
+	// Migration rates after out of Africa migration
+	if (sim.generation > 76968 & sim.generation <= 78084) {
+		nMigrants = rpois(1, p1.individualCount * 15.24422112e-5);
+		migrants_p1 = sample(p1.individuals, nMigrants);
+		migrants_p2 = sample(p2.individuals, nMigrants);
+		migrants_p1.age = 0;
+		migrants_p2.age = 0;
+		p1.takeMigrants(migrants_p2);
+		p2.takeMigrants(migrants_p1);
+	}
+	// migration rates after European - East Asian split
+	if (sim.generation > 78084) {
+		// Set migration rates for the rest of the simulation
+		nMigrants_p1_p2 = rpois(1, p1.individualCount * 2.54332678e-5);
+		nMigrants_p2_p1 = rpois(1, p2.individualCount * 2.54332678e-5);
+		nMigrants_p1_p3 = rpois(1, p1.individualCount * 0.7770583877e-5);
+		nMigrants_p3_p1 = rpois(1, p3.individualCount * 0.7770583877e-5);
+		nMigrants_p2_p3 = rpois(1, p2.individualCount * 3.115817913e-5);
+		nMigrants_p3_p2 = rpois(1, p3.individualCount * 3.115817913e-5);
+		migrants_p1_p2 = p1.sampleIndividuals(nMigrants_p1_p2, migrant = F);
+		migrants_p2_p1 = p1.sampleIndividuals(nMigrants_p2_p1, migrant = F);
+		migrants_p1_p2.age = 0;
+		migrants_p2_p1.age = 0;
+		p1.takeMigrants(migrants_p2_p1);
+		p2.takeMigrants(migrants_p1_p2);
+		migrants_p1_p3 = p1.sampleIndividuals(nMigrants_p1_p3, migrant = F);
+		migrants_p3_p1 = p1.sampleIndividuals(nMigrants_p3_p1, migrant = F);
+		migrants_p1_p3.age = 0;
+		migrants_p3_p1.age = 0;		p1.takeMigrants(migrants_p3_p1);
+		p3.takeMigrants(migrants_p1_p3);
+		migrants_p2_p3 = p1.sampleIndividuals(nMigrants_p2_p3, migrant = F);
+		migrants_p3_p2 = p1.sampleIndividuals(nMigrants_p3_p2, migrant = F);
+		migrants_p2_p3.age = 0;
+		migrants_p3_p2.age = 0;
+		p2.takeMigrants(migrants_p3_p2);
+		p3.takeMigrants(migrants_p2_p3);
+	}
+	// exponential growth in Europe and East Asia
+	if (sim.generation > 78084) {
+		t = sim.generation - 78084;
+		p2.setValue('K', asInteger(round(1032.1046957333444  * (1 + 0.003784324268)^t)));
+		p3.setValue('K', asInteger(round(553.8181989 * (1 + 0.004780219543)^t)));
+	}
+	// parents die; offspring survive proportional to fitness
+	for (subpop in sim.subpopulations) {
+		inds = subpop.individuals;
+		inds[inds.age > 0].fitnessScaling = 0.0;
+	}
+}
+
+
+// Initialize African population size of ~14474 5920 generations ago (148kya assuming g=25)
+73105 early() {
+	afr_n = asInteger(round(14474.54608753566));
+	p1.setValue('K', afr_n);
+}
+
+// Eurasians (p2) Africans (p1) split 2040 generations ago (51kya)
+// OOA size 1861
+// migration rates 1.5e-4
+
+76968 early() {
+	sim.addSubpop("p2", 0).setValue('K', asInteger(round(1861.288190027689)));
+	nMigrants = asInteger(round(1861.288190027689));
+	migrants = sample(p1.individuals, nMigrants);
+
+	p2.takeMigrants(migrants);
+	p2.individuals.age = 0;
+}
+
+// Split Europeans (p2) and East Asians (p3) 920 generations ago (23kya)
+// Size EA (p3) 554, Eur (p2) 1032
+// Growth rate EUR: r=3.8e-3, EA: 4.8e-3
+// Migration: AFR (p1) <--> EUR (p2): 7.8e-5, 3.11e-5; AFR <--> EA (p3) 2.5e-5, 3.11e-5; EUR <--> EA: 2.5e-5, 7.8e-5
+78084 early() {
+	sim.addSubpop("p3", 0).setValue('K', asInteger(round(553.8181989)));
+	nMigrants = asInteger(round(553.8181989));
+	migrants = sample(p2.individuals, nMigrants);
+	migrants.age = 0;
+	p3.takeMigrants(migrants);
+	p2.setValue('K', asInteger(round(1032.1046957333444)));
+}
+// 15 generations ago
+79010 late() {
+	sim.treeSeqOutput(outfile);
+}

@@ -1,0 +1,7 @@
+name: admixture
+channels:
+  - bioconda
+  - defaults
+dependencies:
+  - admixture=1.3.0=0
+prefix: /storage/home/hcoda1/3/apfennig3/.conda/envs/admixture
