@@ -1,0 +1,13 @@
+# ancestries proprotions are the average ancestry proportions per broad regions from Table S10 weighted by the
+# number of sample per region givenin Table S2 in Micheletti et al. NA is the aggregated ancestry proportion of
+# East Asian and Native American
+# also see our Table S1
+,AFR_X,AFR_A,EUR_X,EUR_A,NA_X,NA_A,pf
+Guianas,0.6338,0.5845,0.1353,0.1611,0.0360,0.0405,0.57
+United States,0.7581,0.7119,0.2036,0.2460,0.0288,0.0229,0.58
+British Caribbean,0.8235,0.7493,0.1199,0.1834,0.0142,0.0135,0.56
+Latin Caribbean,0.2385,0.1849,0.5301,0.5232,0.1548,0.0993,0.55
+C South America,0.1845,0.1230,0.6286,0.6396,0.1137,0.0658,0.51
+N South America,0.1403,0.1094,0.4330,0.4895,0.3589,0.2301,0.53
+Central America,0.1071,0.0816,0.3220,0.3166,0.5068,0.3920,0.54
+Cape Verde,0.5803,0.4494,0.3594,0.4962,0.0025,0.0035,0.55
