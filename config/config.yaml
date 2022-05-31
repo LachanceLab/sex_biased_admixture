@@ -1,0 +1,37 @@
+tree_dir: "trees" # directory where to save tree sequences
+chrom_length: 1e8 # automome and sex chromosome length
+mtDNA_length: 20000 # mtDNA length
+recombination_rate: 1e-8
+mutation_rate: 2.36e-8
+mtDNA_mutation_rate: 4e-4
+afr_eur_ea_recipe: "scripts/afr_eur_ea.slim" # slim recipe for continental pops
+afr_eur_ea_non_random_mating_recipe: "scripts/afr_eur_ea_non_random_mating.slim" # slim recipe for contintental pops with setting it up for preferential mating after admixture
+data_dir: "simulations_data" # where to save generate vcf files etc.
+single_pulse_admixture_recipe: "scripts/single_pulse_admixture.slim" # recipe for single pulse american admixture
+single_pulse_admixture_non_random_mating_recipe: "scripts/single_pulse_non_random_mating.slim" # recipe for non random mating after single admixture
+constant_admixture_non_random_mating_recipe: "scripts/constant_admixture_non_random_mating.slim" # recipe for non random mating after single admixture
+rejection_rate_female_eur_male_non_eur: 0.4 #non_random mating --> reject mating European females with non-European males in 0.X cases
+afr: 1.6667e-01 # Initial African admixture proportion
+sm_afr: 3.3333e-01  # Initial contribution of African males 
+eur: 3.3333e-01 # Initial European admixture proportions
+sm_eur: 6.6667e-01 # Initial contribution of European males 
+ea: 0.5 # Initial East Asian admixture proportions
+sm_ea: 4.4444e-01 # Initial contribution of East Asian males
+adx_n: 30000 # Size of admixed population
+constant_admixture_recipe: "scripts/constant_admixture.slim" # Recipe for constant admixture
+afr_const: 0.02 # Migration rate from African population in admixed population
+eur_const: 0.01 # Migration rate from European population in admixed population
+ea_const: 0.005 # Migration rate from East Asian population in admixed population
+sm_afr_const: 3.3333e-01 # Fraction of males migrating from Africa
+sm_eur_const: 6.6667e-01 # Fraction of males migrating from Europe
+sm_ea_const: 4.4444e-01 # Fraction of males migrating from East Asia
+ancestral_Ne: 7310.370867595234 # Population size of ancestral African population
+sample_size: 10000 # sample size
+plot_dir: "plots" # diretory where to save figures
+amr_growth_rate: 0.0 # growth rate of admixed population
+results_dir: "results_no_sex_bias_no_growth_constant_5_sample_10000" # directory where to save results
+first_gen: 15 # First generation after admixture to analyze >= 1 & <= 15
+last_gen: 15 # last generation after admixture to analyze >= 1 & <= 15 & >= first_gen
+demographic_models: ["constant_admixture"] # demographic model to use (single_pulse_admixture, constant_admixture,
+#                                                                      single_pulse_non_random_mating, constant_admixture_non_random_mating)
+
