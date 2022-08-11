@@ -9,13 +9,23 @@ from matplotlib.patches import Polygon
 from estimate_sex_ratios_single_pulse import read_data_summary_statistics, calculate_sex_contributions
 
 
-def sensitivity_analysis(autosomal_ancestry, figure_path):
+def sensitivity_analysis(population, ancestry, data_file, figure_path):
     """
     Plot sensitivity analysis to show divergence (Figure 1)
-    :param autosomal_ancestry: float, autosomal ancestry proportion
+    :param population: str, population which to use as an example for the sensitivity analysis.
+                            Autosomal ancestry proportion for specified population and ancestry will be used.
+    :param ancestry: str, ancestry which to use as an example for the sensitivity analysis.
+                          Autosomal ancestry proportion for specified population and ancestry will be used.
+    :param data_file: str, path to data file summary statistics, i.e., mean ancestry proportions
     :param figure_path: str, Path where to save figure of sensitivity analysis to
 
     """
+    # load data file
+    df, populations, ancestries = read_data_summary_statistics(data_file)
+    # extract autosomal ancestry proportion for example
+    autosomal_ancestry = df.loc[population, ancestry.upper() + '_A']
+    # extract corresponding observed X chromosomal ancestry proportion
+    observed_x_ancestry = df.loc[population, ancestry.upper() + '_X']
     # function for calculating equilibrium sex ratio
     sf_sm = lambda x, a: (3 * x - 2 * a) / (4 * a - 3 * x)
     x_ancestry = np.arange(0, 1.001, 0.001)
@@ -31,7 +41,9 @@ def sensitivity_analysis(autosomal_ancestry, figure_path):
     ax[0].yaxis.set_minor_locator(MultipleLocator(1))
     # make plot squared
     ax[0].set_aspect(0.05)
-    ax[0].plot(x_ancestry, sex_ratio, lw=1)
+    ax[0].plot(x_ancestry, sex_ratio, lw=1, zorder=-1)
+    # plot sex ratio based on observed ancestry proportions
+    ax[0].scatter(observed_x_ancestry, sf_sm(observed_x_ancestry, autosomal_ancestry), marker='^', color='black', zorder=1)
     ax[0].set_xlabel(r'X chromosomal ancestry proportion $\left(H^X_1\right)$', labelpad=10, fontdict=dict(fontsize=7))
     ax[0].set_ylabel(r"Ratio of females to one male $\left(s^f_1/s^m_1\right)$", fontdict=dict(fontsize=7))
     ax[0].set_ylim([-10, 10])
@@ -81,14 +93,22 @@ def sensitivity_analysis(autosomal_ancestry, figure_path):
     ax[1].xaxis.set_minor_locator(MultipleLocator(0.1))
     ax[1].yaxis.set_major_locator(MultipleLocator(0.2))
     ax[1].yaxis.set_minor_locator(MultipleLocator(0.1))
-    ax[1].add_patch(Polygon(patch_neg_too_much_x, closed=True, fill=True, color='darkgray', label='model breakage'))
+    ax[1].add_patch(Polygon(patch_neg_too_much_x, closed=True, fill=True, color='darkgray', label='model failure',
+                            zorder=-1))
     ax[1].add_patch(Polygon(patch_female, closed=True, fill=True,
                             color=(4.535548065502659e-06, 0.5400411873079152, 0.2349801931202921),
-                            label='female-biased'))
+                            label='female-biased', zorder=-1))
     ax[1].add_patch(Polygon(patch_male, closed=True, fill=True,
-                            color=(0.16305460270310312, 0.42335679778955587, 0.9999895609181783), label='male-biased'))
-    ax[1].add_patch(Polygon(patch_neg_too_little_x, closed=True, fill=True, color='darkgray'))
-    ax[1].plot([0, 1], [0, 1], ls='--', color='black', lw= 0.75)
+                            color=(0.16305460270310312, 0.42335679778955587, 0.9999895609181783), label='male-biased',
+                            zorder=-1))
+    ax[1].add_patch(Polygon(patch_neg_too_little_x, closed=True, fill=True, color='darkgray', zorder=-1))
+    ax[1].plot([0, 1], [0, 1], ls='--', color='black', lw=0.75)
+    # plot observed ancestry proportions into space
+    for pop in populations:
+        for anc in ancestries:
+            if df.loc[pop, anc.upper() + "_X"] >= 0.05 and df.loc[pop, anc.upper() + "_A"] >= 0.05:
+                ax[1].scatter(df.loc[pop, anc.upper() + "_X"], df.loc[pop, anc.upper() + "_A"], marker='^',
+                              color="black", s=6)
     ax[1].set_xlim([0, 1.0])
     ax[1].set_ylim([0, 1.0])
     ax[1].set_xlabel(r'X chromosomal ancestry proportion $\left(H^X_1\right)$', labelpad=10, fontdict=dict(fontsize=7))
@@ -244,6 +264,9 @@ def compute_sex_ratios_from_summary_statistics(input_file, output_file, figure_p
             # calculate sex ratios with exact numbers
             females_to_male = sf / sm
             males_to_female = sm / sf
+            # handle infinities due to zero division --> replace with 999
+            females_to_male = np.nan_to_num(females_to_male, posinf=999)
+            males_to_female = np.nan_to_num(males_to_female, posinf=999)
             # round sex ratios to three significant digits
             c_df['{}_sf/sm'.format(ancestry)] = [x.round(2) if np.abs(x) < 10 else x.round(1) if np.abs(x) > 10
                                                                                                  and np.abs(
@@ -296,14 +319,25 @@ def main(argv):
                                               'females contributing to the gene pool. Comments can be included in '
                                               'separate lines, starting with a "#", and are ignored while parsing. '
                                               'The file should be comma separated.', required=False)
-    parser.add_argument('-p', '--populations_of_interest',
+    parser.add_argument('-p1', '--populations_of_interest',
                         help="Populations for which to merge exploration of parameter space into one Figure", nargs='+',
                         required=False, default=[])
+    parser.add_argument('-p2', '--population_of_interest_sensitivity_analysis',
+                        help='Population which to use as an example for the sensitivity analysis. '
+                             'It will use the autosomal ancestry proportion in the specified population '
+                             'of the ancestry specified with -a  [Central America]',
+                        required=False, default="Central America")
+    parser.add_argument('-a', '--ancestry_of_interest_sensitivity_analysis',
+                        help='Ancestry which to use as an example for the sensitivity analysis. '
+                             'It will use the autosomal ancestry proportion in the population specified with -p2 '
+                             'of the specified ancestry  [Afr]',
+                        required=False, default="Afr")
     parser.add_argument('-o', '--output', help='Output filename. Will be an excel file.', required=True)
     parser.add_argument('--figure', required=True, help='Path to save figure with box plots of possible sex ratios to.')
     parser.add_argument('--figure_sensitivity', required=True, help='Path to save figure of senstivity analysis to.')
     args = parser.parse_args()
-    sensitivity_analysis(0.123, args.figure_sensitivity)
+    sensitivity_analysis(args.population_of_interest_sensitivity_analysis,
+                         args.ancestry_of_interest_sensitivity_analysis, args.input, args.figure_sensitivity)
     compute_sex_ratios_from_summary_statistics(args.input, args.output, args.figure, args.populations_of_interest)
 
 
