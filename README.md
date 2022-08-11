@@ -103,10 +103,10 @@ First, the script `sensitivity_analysis_and_distribute_unassigned_ancestry.py` a
 3. A figure illustrating the sensitivity of the applied models. The name of the figure can be specified with the `--figure_sensitivity`flag (Figure 2 in our manuscript).
 
 #### Example usage
-The following command takes mean ancestry proportions from Micheletti et al., distributes all unassigned ancestry for the geographic regions of the Latin Caribbean, central South America, northern South America, and Central America, and saves box plots of corresponding distributions of possible s<sup>f</sup>/s<sup>m</sup> values to figure1.pdf. Additionally, it conducts a sensitivity analysis, which will be plotted to figure2.pdf. Point estimates of s<sup>f</sup>/s<sup>m</sup> for each ancestry and georgraphic regions based on the reported mean ancestry proportions will be written to sex_ratios_micheletti.xlsx.
+The following command takes mean ancestry proportions from Micheletti et al., distributes all unassigned ancestry for the geographic regions of the Latin Caribbean, central South America, northern South America, and Central America, and saves box plots of corresponding distributions of possible s<sup>f</sup>/s<sup>m</sup> values to figure1.pdf. Additionally, it conducts a sensitivity analysis, which will be plotted to figure2.pdf. In this case, it uses the African ancestry proportion that Micheletti et al. reported for central South America for the sensitivity analysis. Point estimates of s<sup>f</sup>/s<sup>m</sup> for each ancestry and georgraphic regions based on the reported mean ancestry proportions will be written to sex_ratios_micheletti.xlsx.
 
 ```
-scripts/sensitivity_analysis_and_distribute_unassigned_ancestry.py -i data/ancestry_proportions_micheletti.txt --figure figure1.pdf -p "Latin Caribbean" "C South America" "N South America" "Central America" --figure_sensitivity figure2.pdf -o sex_ratios_micheletti.xlsx
+scripts/sensitivity_analysis_and_distribute_unassigned_ancestry.py -i data/ancestry_proportions_micheletti.txt --figure figure1.pdf -p1 "Latin Caribbean" "C South America" "N South America" "Central America" --figure_sensitivity figure2.pdf -p2 "C South America" -a Afr -o sex_ratios_micheletti.xlsx
 ```
 
 ### Assessing the robustness of single admixture models to violations of demographic assumptions using simulations
