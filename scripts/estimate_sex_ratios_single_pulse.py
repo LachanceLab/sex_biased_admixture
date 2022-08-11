@@ -123,6 +123,9 @@ def compute_sex_ratios_from_summary_statistics(input_file, output_file):
             # calculate sex ratios with exact numbers
             females_to_male = sf / sm
             males_to_female = sm / sf
+            # handle infinities due to zero division --> replace with 999
+            females_to_male = np.nan_to_num(females_to_male, posinf=999)
+            males_to_female = np.nan_to_num(males_to_female, posinf=999)
             # round sex ratios to three significant digits
             c_df['{}_sf/sm'.format(ancestry)] = [x.round(2) if np.abs(x) < 10 else x.round(1) if np.abs(x) > 10
                                                                                                  and np.abs(
