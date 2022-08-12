@@ -1,4 +1,4 @@
-# Challenges of estimating sex-biased admixture from X chromosomal and autosomal data 
+# Challenges of accurately estimating sex-biased admixture from X chromosomal and autosomal ancestry proportions 
 
 ### Table of Contents
 - [Models for estimating sex ratios assuming single pulse or constant admixture](#models-for-estimating-sex-ratios-assuming-single-pulse-or-constant-admixture)
